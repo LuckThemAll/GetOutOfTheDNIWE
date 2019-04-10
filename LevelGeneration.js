@@ -7,10 +7,10 @@ const WALL_WIDTH = 3;
 const EMPTY_BLOCK_INDEX = 4;
 const CELL_WIDTH = 44;
 const CELL_HEIGTH = 44;
-const BLOCKS = {SOLID : {BLOCK: 0, DYNAMITE: 0, BARREL: 0, WALL: 0, GRASS: 0},
+const BLOCKS = {SOLID : {BLOCK: 0, DYNAMITE: 0, BARREL: 0, WALL: 0, GRASS: 0, S_DYNAMITE: 0},
 		ABSTRACT: {SKY: 0, HOLE: 0, BOOM: 0},
 		MOVE: {BLOCK: 0, DYNAMITE: 0, BARREL: 0},
-		NOT_DESTROYED : {WALL: 0, GRASS: 0}}
+		NOT_DESTROYED : {WALL: 0, GRASS: 0}};
 
 
 console.log('LevelGeneration loading');
@@ -59,15 +59,16 @@ var repaint_field = function(playing_field){
 
 			let class_name;
 			switch (playing_field[i][j]) {
-				case ('SKY')      : { class_name = 'sky';      break }
-				case ('WALL')     : { class_name = 'wall';     break }
-				case ('HOLE')     : { class_name = 'hole';     break }
-				case ('GRASS')    : { class_name = 'grass';    break }
-				case ('HERO')     : { class_name = 'hero';     break }
-				case ('DYNAMITE') : { class_name = 'dynamite'; break }
-				case ('BLOCK')    : { class_name = 'block';    break }
-				case ('BARREL')   : {(i < EMPTY_BLOCK_INDEX + 2) ?  class_name = 'barrel_sky' :  class_name = 'barrel_hole';  break }
-				case ('BOOM')     : {(i < EMPTY_BLOCK_INDEX + 2) ?  class_name = 'boom_sky' :  class_name = 'boom_hole';  break }
+				case ('SKY')       : { class_name = 'sky';      break }
+				case ('WALL')      : { class_name = 'wall';     break }
+				case ('HOLE')      : { class_name = 'hole';     break }
+				case ('GRASS')     : { class_name = 'grass';    break }
+				case ('HERO')      : { class_name = 'hero';     break }
+				case ('DYNAMITE')  : { class_name = 'dynamite'; break }
+				case ('S_DYNAMITE'): { class_name = 'dynamite'; break }
+				case ('BLOCK')     : { class_name = 'block';    break }
+				case ('BARREL')    : {(i < EMPTY_BLOCK_INDEX + 2) ?  class_name = 'barrel_sky' :  class_name = 'barrel_hole';  break }
+				case ('BOOM')      : {(i < EMPTY_BLOCK_INDEX + 2) ?  class_name = 'boom_sky' :  class_name = 'boom_hole';  break }
 			}
 			$('#' + id).addClass(class_name);
 		}

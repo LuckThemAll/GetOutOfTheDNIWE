@@ -1,11 +1,11 @@
-"use strict"
+"use strict";
 
 $(document).ready(function(){
 
 	const HERO_FALLING_SPEED = 100;
 	const WALL_START_INDEX = EMPTY_BLOCK_INDEX + 1;
 	const HOLE_BORDER = EMPTY_BLOCK_INDEX + 2;
-	const BOOM_ANIGILETE = BLOCK_FALLING_SPEED-200;
+	var BOOM_ANIGILETE = BLOCK_FALLING_SPEED-200;
 	var BOOM_DELAY = 500;
 	var timeouts_id = [];
 	var BLOCK_SPAWN_SPEED = 2000;
@@ -40,7 +40,7 @@ $(document).ready(function(){
 				engine.arcade_annihilate(playing_field)
 			}, 1300));
 	
-	}
+	};
 
 	var move_block = function(x, y, dx) {
 		if (game_over) return;
@@ -58,21 +58,21 @@ $(document).ready(function(){
 		playing_field[y][x] = (y < HOLE_BORDER) ? 'SKY' : 'HOLE';
 	
 		repaint_field(playing_field);
-	}
+	};
 	
 	var drop_hero = function() {
 		if (game_over) return;
 		
 		for (let i = engine.hero_coords[1]; i < FIELD_HEIGHT; ++i)
 			if (playing_field[i][engine.hero_coords[0]] in BLOCKS.ABSTRACT) { // если под порсонажем находятся абстрактные блоки
-				console.log('drop hero')
+				console.log('drop hero');
 				timeouts_id.push(setTimeout(function() {
 					move_to(0, 1);
 					drop_hero();
 				}, HERO_FALLING_SPEED));
 				return;
 			}
-	}
+	};
 			
 	move_to = function(dx, dy) {
 		if (game_over) return;
@@ -109,7 +109,7 @@ $(document).ready(function(){
 		}
 		
 		
-	}
+	};
 	
 	Engine.prototype.generate_playing_field = function(){
 		let result = [];
@@ -137,7 +137,7 @@ $(document).ready(function(){
 		}
 		console.log('playing_field loaded');
 		return result;
-	}
+	};
 	
 	
 
@@ -153,7 +153,7 @@ $(document).ready(function(){
 		console.log('hero index = ' + playing_field[this.hero_coords[1]][this.hero_coords[0]]);
 		$('#' + id).addClass('hero');
 		
-	}
+	};
 
   	Engine.prototype.lowering_of_blocks = function(playing_field) { // функция пробегает по всем блокам и опускает их
 		if (game_over) return;
@@ -163,13 +163,7 @@ $(document).ready(function(){
 				// для динамита //
 
 				if ((playing_field[i][j] == 'DYNAMITE') && (playing_field[i + 1][j] in BLOCKS.SOLID)){  // условия взрыва
-					if (IS_ARCADE){
-					(i != FIELD_HEIGHT - 2) ? detanete(i, j) : 
-					(DYNAMITE_SPAWNED ? DYNAMITE_SPAWNED = false : detanete(i, j));  //setTimeout(function(){detanete(i, j)}, BLOCK_SPAWN_SPEED)	
-						
-					}
-					else
-						detanete(i, j);
+					detanete(i, j);
 				}
 
 				//////////////////
@@ -219,69 +213,77 @@ $(document).ready(function(){
 		timeouts_id.push(setTimeout(function(){
 			Engine.prototype.lowering_of_blocks(playing_field)
 		}, BLOCK_FALLING_SPEED));
-	}
+	};
 	
 	function detanete(i, j){
-		
-		if (!DYNAMITE_SPAWNED) DYNAMITE_SPAWNED = true;
-		
-		if (playing_field[i][j + 1] == 'HERO' || playing_field[i][j - 1] == 'HERO' ||
-		playing_field[i + 1][j] == 'HERO' || playing_field[i - 1][j] == 'HERO')
-			timeouts_id.push(setTimeout(function(){stop_game('loose')}, BOOM_ANIGILETE));
-		
-		playing_field[i][j] = 'BOOM';
-		playing_field[i - 1][j] = 'BOOM';
+		function set_boom(i, j){
+			playing_field[i][j] = 'BOOM';
+			playing_field[i - 1][j] = 'BOOM';
 
-		if (!(playing_field[i + 1][j] in BLOCKS.NOT_DESTROYED))
-			playing_field[i + 1][j] = 'BOOM';
+			if (!(playing_field[i + 1][j] in BLOCKS.NOT_DESTROYED))
+				playing_field[i + 1][j] = 'BOOM';
 
-		if (!(playing_field[i][j + 1] in BLOCKS.NOT_DESTROYED))
-			playing_field[i][j + 1] = 'BOOM';
+			if (!(playing_field[i][j + 1] in BLOCKS.NOT_DESTROYED))
+				playing_field[i][j + 1] = 'BOOM';
 
-		if (!(playing_field[i][j - 1] in BLOCKS.NOT_DESTROYED))
-			playing_field[i][j - 1] = 'BOOM';
-		
-		timeouts_id.push(setTimeout(function(){
-			if (i < HOLE_BORDER) {
+			if (!(playing_field[i][j - 1] in BLOCKS.NOT_DESTROYED))
+				playing_field[i][j - 1] = 'BOOM';
+		}
+		function set_boom_anigilete(i, j) {
+			timeouts_id.push(setTimeout(function(){
+				if (i < HOLE_BORDER) {
+					if (playing_field[i][j] == 'BOOM')
+						playing_field[i][j] = 'SKY';
 
-				if (playing_field[i][j] == 'BOOM')	
-				playing_field[i][j] = 'SKY';
-			
-				if (playing_field[i - 1][j] == 'BOOM') 
-					playing_field[i - 1][j] = 'SKY';
-
-				(i + 1 < HOLE_BORDER) ? playing_field[i + 1][j] = 'SKY' : playing_field[i + 1][j] = 'HOLE';
-
-				if (playing_field[i][j + 1] == 'BOOM')
-					playing_field[i][j + 1] = 'SKY';
-
-				if (playing_field[i][j - 1] == 'BOOM')
-					playing_field[i][j - 1] = 'SKY';
-
-			} else {
-
-				if (playing_field[i][j] == 'BOOM')
-					playing_field[i][j] = 'HOLE';
-
-				if (i - 1 < HOLE_BORDER){
 					if (playing_field[i - 1][j] == 'BOOM')
 						playing_field[i - 1][j] = 'SKY';
-				}
-				else
+
+					(i + 1 < HOLE_BORDER) ? playing_field[i + 1][j] = 'SKY' : playing_field[i + 1][j] = 'HOLE';
+
+					if (playing_field[i][j + 1] == 'BOOM')
+						playing_field[i][j + 1] = 'SKY';
+
+					if (playing_field[i][j - 1] == 'BOOM')
+						playing_field[i][j - 1] = 'SKY';
+
+				} else {
+
+					if (playing_field[i][j] == 'BOOM')
+						playing_field[i][j] = 'HOLE';
+
+					if (i - 1 < HOLE_BORDER){
+						if (playing_field[i - 1][j] == 'BOOM')
+							playing_field[i - 1][j] = 'SKY';
+					}
+					else
 					if (playing_field[i - 1][j] == 'BOOM')
 						playing_field[i - 1][j] = 'HOLE';
 
-				if (playing_field[i + 1][j] == 'BOOM')
-					playing_field[i + 1][j] = 'HOLE';
+					if (playing_field[i + 1][j] == 'BOOM')
+						playing_field[i + 1][j] = 'HOLE';
 
-				if (playing_field[i][j + 1] == 'BOOM')
-					playing_field[i][j + 1] = 'HOLE';
+					if (playing_field[i][j + 1] == 'BOOM')
+						playing_field[i][j + 1] = 'HOLE';
 
-				if (playing_field[i][j - 1] == 'BOOM')
-					playing_field[i][j - 1] = 'HOLE';
-			}
-		},BOOM_ANIGILETE/* + BOOM_DELAY*/));
-
+					if (playing_field[i][j - 1] == 'BOOM')
+						playing_field[i][j - 1] = 'HOLE';
+				}
+			},BOOM_ANIGILETE/* + BOOM_DELAY*/));
+		}
+		if (playing_field[i][j] == 'S_DYNAMITE'){
+			if (playing_field[i][j + 1] == 'HERO' || playing_field[i][j - 1] == 'HERO' ||
+				playing_field[i + 1][j] == 'HERO' || playing_field[i - 1][j] == 'HERO')
+				timeouts_id.push(setTimeout(function(){stop_game('loose')}, BOOM_ANIGILETE));
+			set_boom(i, j);
+			set_boom_anigilete(i, j);
+		}
+		else{
+			if (playing_field[i][j + 1] == 'HERO' || playing_field[i][j - 1] == 'HERO' ||
+				playing_field[i + 1][j] == 'HERO' || playing_field[i - 1][j] == 'HERO')
+					timeouts_id.push(setTimeout(function(){stop_game('loose')}, BOOM_ANIGILETE));
+			set_boom(i, j);
+			set_boom_anigilete(i, j);
+		}
 		drop_hero();
 	}
 
@@ -309,7 +311,7 @@ $(document).ready(function(){
 		timeouts_id.push(setTimeout(function(){
 			Engine.prototype.spawn_block(playing_field)
 		}, BLOCK_SPAWN_SPEED));
-	} 
+	};
 	
 	Engine.prototype.arcade_annihilate = function(playing_field){
 		if (game_over) return;
@@ -320,7 +322,8 @@ $(document).ready(function(){
 			    if ((j % 2) == 0) {
 			        if (playing_field[floor_index][j] == 'HERO')
 			            move_to(0, -1);
-			        playing_field[floor_index][j] = 'DYNAMITE';
+			        playing_field[floor_index][j] = 'S_DYNAMITE';
+					timeouts_id.push(setTimeout(function(){detanete(floor_index, j)}, BOOM_DELAY));
 			    }
 			repaint_field(playing_field);
 			console.log(playing_field);
@@ -328,13 +331,13 @@ $(document).ready(function(){
 			BLOCK_SPAWN_SPEED -= 5*1;
 			BLOCK_FALLING_SPEED -= 5*1;
 		}, BLOCK_SPAWN_SPEED * 15));
-	}
+	};
 	
 	function stop_game(result){
 		$('#menu').show();
 		$('#' + result).show();
 		game_over = true;
-		return;
+
 	}
 
 	var set_diff = function(){
@@ -382,6 +385,7 @@ $(document).ready(function(){
 				DYNAMITE_CHANCE = 15;
 				BLOCK_SPAWN_SPEED = 800;
 				BLOCK_FALLING_SPEED = 400;
+				BOOM_ANIGILETE = 700;
 				FIELD_WIDTH = 15;
 				FIELD_HEIGHT = 20;
 				BOOM_DELAY = 500;
@@ -390,7 +394,7 @@ $(document).ready(function(){
 				break; 
 			}
 		}
-	}
+	};
 
 	$('#play-btn').click(function () {
 		console.log('___________');
